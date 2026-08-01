@@ -2,14 +2,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel
 from app.db.session import engine
-from app.layers.routers import auth
+
+# Importamos todos los routers
+from app.layers.routers import auth, destinos, ubicaciones, transporte
 
 app = FastAPI(title="PAT API")
 
-# Configurar CORS para permitir peticiones desde tu frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción se especifica la URL exacta
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -19,7 +20,11 @@ app.add_middleware(
 def on_startup():
     SQLModel.metadata.create_all(engine)
 
+# Registrar Routers
 app.include_router(auth.router)
+app.include_router(destinos.router)
+app.include_router(ubicaciones.router)
+app.include_router(transporte.router) # <--- Agregamos el router de ubicaciones
 
 @app.get("/")
 def root():
