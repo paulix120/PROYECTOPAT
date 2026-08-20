@@ -1,17 +1,10 @@
 from .auth import (
     User,
     UserCreate,
+    UserLogin,
     UserResponse,
     Token,
     ForgotPasswordRequest,
     ResetPasswordRequest,
-)
-from .destinos import (
-    Departamento,
-    Ciudad,
-    TipoTurismo,
-    Destino,
-    DestinoResponse,
-    DestinoCreate,  
-    DestinoUpdate,   
+    ChangePasswordRequest,
 )

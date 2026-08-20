@@ -1,41 +1,105 @@
 from datetime import datetime
 from typing import Optional
+
+from pydantic import EmailStr
 from sqlmodel import Field, SQLModel
 
-class User(SQLModel, table=True):
-    __tablename__ = "usuarios"
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+# ======================================================
+# MODELO DE BASE DE DATOS
+# ======================================================
+
+class User(SQLModel, table=True):
+    __tablename__ = "usuario"
+
+    id_usu: Optional[int] = Field(
+        default=None,
+        primary_key=True
+    )
+
     nombre: str
     apellido: str
-    email: str
-    password_hash: str
-    rol_id: int = Field(default=1)
-    activo: bool = Field(default=True)
-    token_recuperacion: Optional[str] = Field(default=None)
-    token_expiracion: Optional[datetime] = Field(default=None)
 
-# Esquemas para autenticación
+    email: str = Field(
+        index=True
+    )
+
+    password_hash: str
+
+    id_rol: int = Field(
+        default=1
+    )
+
+    activo: bool = Field(
+        default=True
+    )
+
+    token_recuperacion: Optional[str] = None
+
+    token_expiracion: Optional[datetime] = None
+
+    created_at: Optional[datetime] = None
+
+
+# ======================================================
+# DTO CREAR USUARIO
+# ======================================================
+
 class UserCreate(SQLModel):
     nombre: str
     apellido: str
-    email: str
+    email: EmailStr
     password: str
 
+
+# ======================================================
+# DTO LOGIN
+# ======================================================
+
+class UserLogin(SQLModel):
+    email: EmailStr
+    password: str
+
+
+# ======================================================
+# DTO RESPUESTA
+# ======================================================
+
 class UserResponse(SQLModel):
-    id: int
+    id_usu: int
     nombre: str
     apellido: str
     email: str
-    rol_id: int
+    id_rol: int
+    activo: bool
+
+
+# ======================================================
+# TOKEN JWT
+# ======================================================
 
 class Token(SQLModel):
     access_token: str
     token_type: str
 
+
+# ======================================================
+# RECUPERAR CONTRASEÑA
+# ======================================================
+
 class ForgotPasswordRequest(SQLModel):
-    email: str
+    email: EmailStr
+
 
 class ResetPasswordRequest(SQLModel):
     token: str
+    new_password: str
+
+
+# ======================================================
+# CAMBIAR CONTRASEÑA
+# ======================================================
+
+class ChangePasswordRequest(SQLModel):
+    current_password: str
     new_password: str
