@@ -68,6 +68,37 @@ class ServicioService:
             })
         return respuesta
 
+    @staticmethod
+    def listar_todos_los_servicios(db: Session):
+        from app.layers.models.servicio_imagen import ServicioImagen
+        from app.layers.models.ubicacion import Ubicacion
+        from app.layers.models.tp_turismo import TpTurismo
+        from app.layers.models.gama import Gama
+        from sqlmodel import select
+        
+        servicios = ServicioRepository.obtener_todos_los_servicios(db)
+        resultado = []
+        for s in servicios:
+            # Buscar imagen principal
+            img = db.exec(select(ServicioImagen).where(ServicioImagen.id_servicio == s.id_servicio, ServicioImagen.es_principal == True)).first()
+            if not img:
+                img = db.exec(select(ServicioImagen).where(ServicioImagen.id_servicio == s.id_servicio)).first()
+            
+            # Traer TODOS los datos relacionados
+            ubi = db.get(Ubicacion, s.id_ubi)
+            gama = db.get(Gama, s.id_gama)
+            turismo = db.get(TpTurismo, s.id_tp_turi)
+            
+            # Armar diccionario
+            s_dict = s.model_dump()
+            s_dict["imagen_principal"] = img.ruta_url if img else None
+            s_dict["ubicacion"] = ubi.model_dump() if ubi else None
+            s_dict["gama_nombre"] = gama.nombre if gama else "No especificada"
+            s_dict["turismo_nombre"] = turismo.nombre if turismo else "No especificado"
+            resultado.append(s_dict)
+            
+        return resultado
+
     # --- UPDATE (PUT) ---
     @staticmethod
     def actualizar_hotel_base(db: Session, id_servicio: int, data: HospedajeBaseUpdate, usuario: User):

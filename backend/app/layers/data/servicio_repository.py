@@ -12,6 +12,10 @@ class ServicioRepository:
         return servicio
 
     @staticmethod
+    def obtener_todos_los_servicios(db: Session) -> List[Servicio]:
+        return db.exec(select(Servicio).where(Servicio.activo == True)).all()
+    
+    @staticmethod
     def agregar_espacio(db: Session, espacio: ServicioHospedaje) -> ServicioHospedaje:
         db.add(espacio)
         db.commit()

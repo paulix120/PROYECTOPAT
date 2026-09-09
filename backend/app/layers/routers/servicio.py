@@ -1,14 +1,25 @@
+from typing import List # Agrega esto
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 from app.db.session import get_session
 from app.core.security import get_current_user, require_role
 from app.layers.models.auth import User
-from app.layers.models.servicio import HospedajeBaseCreate, HospedajeEspacioCreate, HospedajeBaseUpdate, HospedajeEspacioUpdate
+from app.layers.models.servicio import Servicio, HospedajeBaseCreate, HospedajeEspacioCreate, HospedajeBaseUpdate, HospedajeEspacioUpdate # Agrega 'Servicio' aquí
 from app.layers.business.servicio_service import ServicioService
 
 router = APIRouter(prefix="/servicios", tags=["Oferta Turística (Fase 3)"])
 
 # ================= GET =================
+
+# -----> ESTE ES EL NUEVO ENDPOINT GENERAL <-----
+from typing import Any
+@router.get("/", response_model=List[Any])
+def listar_todos_los_servicios(db: Session = Depends(get_session)):
+    """
+    Retorna TODOS los servicios registrados en la plataforma (Hospedaje, Gastronomía, Recreación, etc).
+    """
+    return ServicioService.listar_todos_los_servicios(db)
+
 @router.get("/hospedajes")
 def listar_hospedajes(db: Session = Depends(get_session)):
     return ServicioService.listar_alojamientos_con_espacios(db)

@@ -40,3 +40,11 @@ from .politica import Politica, PoliticaCreate, PoliticaUpdate, PoliticaResponse
 from .condicion import Condiciones, CondicionCreate, CondicionUpdate, CondicionResponse
 from .servicio_imagen import ServicioImagen
 from .servicio_condicion import ServicioCondicion, ServicioCondicionCreate
+from .servicio_gastronomia import (
+    ServicioGastronomia, RestauranteBaseCreate, PlatoGastronomiaCreate,
+    RestauranteBaseUpdate, PlatoGastronomiaUpdate,
+    RestauranteConMenuResponse, PlatoGastronomiaResponse
+)
+from .servicio_recreacion import ServicioRecreacion, RecreacionCreate, RecreacionUpdate
+from .servicio_transporte import ServicioTransporte, TransporteCreate, TransporteUpdate
+from .servicio_guia import ServicioGuia, GuiaCreate, GuiaUpdate

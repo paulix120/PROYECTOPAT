@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Usuario - PAT</title>
+    <link rel="stylesheet" href="css/styles_menu_usuario.css">
+    <link rel="icon" type="image/png" href="img/Designer_icon.png">
+</head>
+<body>
+    <div class="layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">✈</div>
+                <span>PAT</span>
+            </div>
+
+            <div class="menu-title">MI NAVEGACIÓN</div>
+            <div class="nav-menu">
+                <button data-view="inicio" class="active">⌂ Catálogo Completo</button>
+                <button data-view="crear-plan">+ Crear Plan de Viaje</button>
+                <button data-view="mis-viajes">⇅ Mis Viajes</button>
+            </div>
+
+            <div class="menu-title" style="margin-top: 24px;">OPCIONES</div>
+            <div class="nav-menu">
+                <button onclick="cerrarSesion()">⏹ Cerrar sesión</button>
+            </div>
+
+            <div class="promo-box">
+                <h4>Planifica tus Viajes</h4>
+                <p>Arma tu itinerario ideal con hoteles, restaurantes y rutas en Colombia.</p>
+                <button onclick="cambiarVista('crear-plan')">Crear Plan Ahora</button>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main">
+            <!-- HEADER -->
+            <header class="header">
+                <div>
+                    <h1 id="header-title">Catálogo de Servicios</h1>
+                    <p id="header-subtitle">Explora los mejores destinos, hoteles y más.</p>
+                </div>
+                <div class="header-right">
+                    <div class="admin-user">
+                        <div class="avatar" id="avatarLetras">US</div>
+                        <span id="nombreUsuario">Usuario</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- CONTENT -->
+            <div class="content">
+                <!-- VISTA 1: CATÁLOGO -->
+                <div class="view active" id="view-inicio">
+                    <div class="section-header">
+                        <h2>Explora los Servicios</h2>
+                        <input type="text" id="searchInput" class="search" placeholder="🔍 Buscar por nombre, lugar o descripción...">
+                    </div>
+
+                    <div class="category-block">
+                        <div class="category-header">
+                            <h3>🏖️ Destinos Turísticos y Recreación</h3>
+                        </div>
+                        <div class="cards" id="listaRecreacion"></div>
+                    </div>
+
+                    <div class="category-block">
+                        <div class="category-header">
+                            <h3>🏨 Hoteles y Hospedaje</h3>
+                        </div>
+                        <div class="cards" id="listaHospedaje"></div>
+                    </div>
+
+                    <div class="category-block">
+                        <div class="category-header">
+                            <h3>🍽️ Restaurantes y Gastronomía</h3>
+                        </div>
+                        <div class="cards" id="listaGastronomia"></div>
+                    </div>
+
+                    <div class="category-block">
+                        <div class="category-header">
+                            <h3>🚌 Transporte</h3>
+                        </div>
+                        <div class="cards" id="listaTransporte"></div>
+                    </div>
+
+                    <div class="category-block">
+                        <div class="category-header">
+                            <h3>🗺️ Guías Turísticos</h3>
+                        </div>
+                        <div class="cards" id="listaGuias"></div>
+                    </div>
+                </div>
+
+                <!-- VISTA 2: DETALLES DEL SERVICIO -->
+                <div class="view" id="view-detalle-servicio">
+                    <button class="btn btn-secondary" onclick="volverAlCatalogo()" style="margin-bottom: 20px;">← Volver al Catálogo</button>
+                    
+                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 28px;">
+                        <div style="display: flex; gap: 28px; flex-wrap: wrap;">
+                            <img id="detalleImagen" class="card-img" style="width: 320px; height: 220px; border-radius: 10px; object-fit: cover;" alt="Imagen del servicio">
+                            
+                            <div style="flex: 1; min-width: 280px;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                    <h2 id="detalleNombre" style="font-size: 22px; color: #0f172a;"></h2>
+                                    <span class="badge badge-info" id="detalleCategoria"></span>
+                                </div>
+                                <p id="detalleDescripcion" style="color: #475569; font-size: 14px; margin-bottom: 16px; line-height: 1.6;"></p>
+                                
+                                <div style="background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; color: #475569;">
+                                    <div style="margin-bottom: 6px;">📍 <strong>Dirección:</strong> <span id="detalleDireccion"></span></div>
+                                    <div style="margin-bottom: 6px;">🏙️ <strong>Barrio:</strong> <span id="detalleBarrio"></span></div>
+                                    <div>📮 <strong>Código Postal:</strong> <span id="detalleCP"></span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="contenedorOpcionesServicio" style="margin-top: 28px; border-top: 1px solid #e2e8f0; padding-top: 20px; display: none;">
+                            <h3 id="tituloOpciones" style="font-size: 16px; margin-bottom: 14px; color: #0f172a;"></h3>
+                            <div id="listaOpciones" class="list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VISTA 3: CREAR PLAN DE VIAJE -->
+                <div class="view" id="view-crear-plan">
+                    <div class="section-header">
+                        <h2>Arma tu Plan de Viaje</h2>
+                    </div>
+
+                    <!-- Paso 1: Crear Plan Base -->
+                    <div id="seccionPlanBase" class="form-card">
+                        <h3>Paso 1: Define tu Plan de Viaje</h3>
+                        <p style="color: #64748b; font-size: 13px; margin-bottom: 18px;">Ingresa el nombre de tus vacaciones y las fechas en las que viajarás.</p>
+                        <form id="crearPlanForm">
+                            <div class="form-group">
+                                <label for="nombrePlan">Nombre del Viaje:</label>
+                                <input type="text" id="nombrePlan" placeholder="Ej: Vacaciones a Cartagena 2026" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="fechaInicio">Fecha de Inicio:</label>
+                                <input type="date" id="fechaInicio" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="fechaFin">Fecha de Fin:</label>
+                                <input type="date" id="fechaFin" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">Iniciar Plan y Agregar Servicios →</button>
+                        </form>
+                    </div>
+
+                    <!-- Paso 2: Agregar Servicios -->
+                    <div id="seccionPlanItems" class="form-card" style="display: none;">
+                        <h3>Paso 2: Agrega Servicios a tu Carrito</h3>
+                        <p style="color: #64748b; font-size: 13px; margin-bottom: 18px;">Selecciona los restaurantes, hoteles o atracciones que deseas para cada fecha.</p>
+                        
+                        <form id="agregarItemForm">
+                            <div class="form-group">
+                                <label for="tipoServicio">¿Qué deseas agregar?</label>
+                                <select id="tipoServicio" required>
+                                    <option value="">-- Selecciona --</option>
+                                    <option value="HOSPEDAJE">🏨 Hotel / Hospedaje</option>
+                                    <option value="GASTRONOMIA">🍽️ Restaurante (Elegir Platos)</option>
+                                    <option value="DESTINO_TURISTICO">🏖️ Destino Turístico o Recreación</option>
+                                    <option value="TRANSPORTE">🚌 Transporte de Proveedor (Ruta Fija)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="itemEspecifico">Elige la opción exacta:</label>
+                                <input type="text" id="filtroOpcionesPlan" placeholder="🔍 Buscar restaurante, hotel o plato..." style="margin-bottom: 8px;">
+                                <select id="itemEspecifico" required>
+                                    <option value="">-- Primero elige el tipo arriba --</option>
+                                </select>
+                            </div>
+
+                            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                                <div class="form-group" style="flex: 1; min-width: 180px;">
+                                    <label for="fechaServicio">Fecha de uso:</label>
+                                    <input type="date" id="fechaServicio" required>
+                                </div>
+                                <div class="form-group" style="flex: 1; min-width: 180px;">
+                                    <label for="cantidadItem">Cantidad / Personas:</label>
+                                    <input type="number" id="cantidadItem" min="1" value="1" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 14px;">+ Añadir al carrito</button>
+                        </form>
+
+                        <div style="margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 18px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <h4 style="color: #0f172a; font-size: 15px;">Resumen del Carrito</h4>
+                                <div class="plan-price">Total: $<span id="costoTotal">0.00</span></div>
+                            </div>
+                            <div id="listaResumen" class="list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VISTA 4: MIS VIAJES -->
+                <div class="view" id="view-mis-viajes">
+                    <div class="section-header">
+                        <h2>Historial de Mis Viajes</h2>
+                    </div>
+                    <div id="listaMisPlanes"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/menu_usuario/menu_usuario.js"></script>
+</body>
+</html>
