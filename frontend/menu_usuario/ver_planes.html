@@ -3,268 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Planes de Viaje - PAT Colombia</title>
+    <title>Mis Planes de Viaje - PAT</title>
     
+    <!-- Librerías de Mapas (Leaflet) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-    
+
     <style>
-        :root { --primary: #2563eb; --primary-hover: #1d4ed8; --success: #16a34a; --dark: #0f172a; --gray-600: #475569; --gray-200: #e2e8f0; --white: #ffffff; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: var(--dark); min-height: 100vh; padding-bottom: 60px; }
-        .navbar { background: var(--white); border-bottom: 1px solid var(--gray-200); position: sticky; top: 0; z-index: 50; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-        .brand { font-size: 20px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .btn { padding: 9px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
-        .btn-primary { background: var(--primary); color: var(--white); }
-        .btn-outline { background: var(--white); color: var(--dark); border: 1px solid var(--gray-200); }
-        .btn-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; padding: 20px; margin: 0; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        nav a { text-decoration: none; color: #007bff; font-weight: bold; margin-right: 15px; }
+        .btn-logout { background: white; border: 1px solid red; color: red; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-logout:hover { background: #ffe6e6; }
         
-        .main-container { max-width: 1100px; margin: 32px auto; padding: 0 20px; }
-        .plan-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: 18px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
-        .plan-header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--gray-200); padding-bottom: 16px; margin-bottom: 16px; }
-        .plan-title { font-size: 22px; font-weight: 800; color: var(--dark); }
-        .plan-price { font-size: 24px; font-weight: 800; color: var(--success); }
+        /* Modales ocultos para Editar y Origen/Destino */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 9999; }
+        .modal-caja { background: white; padding: 25px; border-radius: 8px; width: 100%; max-width: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .modal-caja input, .modal-caja select { width: 100%; padding: 10px; margin: 8px 0 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .modal-caja button { padding: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 48%; }
+        .btn-guardar { background: #007bff; color: white; }
+        .btn-cancelar { background: #e0e0e0; color: black; }
         
-        .item-chip { background: #f8fafc; border: 1px solid var(--gray-200); border-radius: 12px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .item-info { flex: 1; }
-        .item-actions button { background: transparent; border: 1px solid var(--gray-200); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-left: 6px; }
-        .item-actions button:hover { background: #f1f5f9; }
-        
-        .plan-footer-actions { display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--gray-200); justify-content: flex-end; }
+        /* Para esconder caja extra de leaflet routing */
         .leaflet-routing-container { display: none !important; }
     </style>
 </head>
 <body>
-
-    <header class="navbar">
-        <div class="brand" onclick="window.location.href='menu_usuario.html'">✈ PAT Turismo</div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn btn-outline" onclick="window.location.href='menu_usuario.html'">← Catálogo</button>
-            <button class="btn btn-primary" onclick="window.location.href='crear_plan.html'">+ Nuevo Plan</button>
-            <button class="btn btn-outline" style="color: red; border-color: red;" onclick="localStorage.clear(); window.location.href='../login.html'">Salir</button>
+    <header>
+        <div>
+            <b style="font-size: 18px; color: #007bff;">✈ PAT Turismo</b> &nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="menu_usuario.html">← Volver al Catálogo</a>
+            <a href="crear_plan.html">+ Crear Nuevo Plan</a>
         </div>
+        <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
     </header>
 
-    <main class="main-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h1 style="font-size: 26px; font-weight: 800;">Historial de Mis Viajes</h1>
-            <h3 style="color: var(--success);">Presupuesto Total: <span id="granTotal">0</span></h3>
+    <div style="max-width: 1100px; margin: 0 auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1 style="margin: 0;">Mis Planes de Viaje</h1>
+            <h3 style="margin: 0; color: #28a745;">Presupuesto Total: <span id="granTotal">$0 COP</span></h3>
         </div>
-
+        
+        <!-- Contenedor donde JS inyectará los planes -->
         <div id="listaMisPlanes">
-            <div style="text-align: center; padding: 40px; color: var(--gray-600);">Cargando tus planes de viaje...</div>
+            <p>Cargando tus planes de viaje...</p>
         </div>
-    </main>
+    </div>
 
-    <script>
-        const API_URL = "http://127.0.0.1:8000";
-        const token = localStorage.getItem("token");
+    <!-- MODAL: EDITAR ÍTEM -->
+    <div id="modalEditar" class="modal-overlay">
+        <div class="modal-caja">
+            <h3 style="margin-top: 0;">✏️ Editar servicio</h3>
+            <form id="formEditarItem">
+                <div id="campoPersonasEdit" style="display:none;">
+                    <label><b>Cantidad de personas:</b></label>
+                    <input type="number" id="editPersonas" min="1">
+                </div>
+                
+                <label id="labelCantidadEdit"><b>Cantidad:</b></label>
+                <input type="number" id="editCantidad" min="1" required>
+                
+                <label><b>Fecha del servicio:</b></label>
+                <input type="date" id="editFecha" required>
+                
+                <div style="display: flex; justify-content: space-between;">
+                    <button type="submit" class="btn-guardar">Guardar cambios</button>
+                    <button type="button" class="btn-cancelar" onclick="cerrarModalEditar()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        document.addEventListener("DOMContentLoaded", () => {
-            if (!token) { window.location.href = "../login.html"; return; }
-            cargarMisPlanes();
-        });
+    <!-- MODAL: ORÍGEN Y DESTINO -->
+    <div id="modalOrigenDestino" class="modal-overlay">
+        <div class="modal-caja">
+            <h3 style="margin-top: 0;">📍 Origen y Destino</h3>
+            <p style="font-size: 13px; color: #666;">Define las ciudades para calcular la ruta en el mapa.</p>
+            
+            <label><b>Origen Principal:</b></label>
+            <select id="selOrigenPlan" required></select>
+            
+            <label><b>Destino Principal:</b></label>
+            <select id="selDestinoPlan" required></select>
+            
+            <div style="display: flex; justify-content: space-between;">
+                <button type="button" class="btn-guardar" onclick="guardarOrigenDestino()">Guardar Ruta</button>
+                <button type="button" class="btn-cancelar" onclick="document.getElementById('modalOrigenDestino').style.display='none'">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
-        async function cargarMisPlanes() {
-            try {
-                const res = await fetch(`${API_URL}/planes-viaje/mis-planes`, { headers: { "Authorization": `Bearer ${token}` } });
-                const planes = res.ok ? await res.json() : [];
-                renderizarPlanes(planes);
-            } catch (err) { console.error(err); }
-        }
-
-        function renderizarPlanes(planes) {
-            const cont = document.getElementById("listaMisPlanes");
-            cont.innerHTML = "";
-            let sumaTotal = 0;
-
-            if (planes.length === 0) {
-                cont.innerHTML = `<div style="text-align:center; padding:40px; border:1px dashed #cbd5e1; border-radius:12px;">No tienes viajes aún. Crea uno nuevo.</div>`;
-                document.getElementById("granTotal").textContent = "$0 COP";
-                return;
-            }
-
-            planes.forEach(plan => {
-                const totalPlan = Number(plan.costo_total_estimado) || 0;
-                sumaTotal += totalPlan;
-
-                let itemsHTML = "";
-                const items = plan.items_agregados || [];
-
-                items.forEach(it => {
-                    const icono = obtenerIcono(it.tipo_item, it.observaciones);
-                    const desc = it.observaciones || it.tipo_item;
-                    let tiempoTxt = "";
-                    if (it.tiempo_estimado_min > 0) {
-                        const h = Math.floor(it.tiempo_estimado_min / 60); const m = it.tiempo_estimado_min % 60;
-                        tiempoTxt = ` | ⏱️ ${h > 0 ? h + 'h ' : ''}${m}m`;
-                    }
-
-                    itemsHTML += `
-                        <div class="item-chip">
-                            <div class="item-info">
-                                <div style="font-weight: 700; font-size: 14px;">${icono} ${desc}</div>
-                                <div style="font-size: 12px; color: var(--gray-600); margin-top: 4px;">📅 ${it.fecha_servicio} | Cant: ${it.cantidad}${tiempoTxt}</div>
-                            </div>
-                            <div style="display:flex; align-items:center; gap: 16px;">
-                                <div style="font-weight: 800; color: var(--success);">+$${Number(it.subtotal_calculado).toLocaleString()}</div>
-                                <div class="item-actions">
-                                    <button onclick="editarItem(${it.id_det_plan}, ${it.cantidad})">✏️</button>
-                                    <button onclick="eliminarItem(${it.id_det_plan})" style="color:red;">🗑️</button>
-                                </div>
-                            </div>
-                        </div>`;
-                });
-
-                const badgeT = items.some(it => it.tipo_item === 'TRANSPORTE' || it.tipo_item === 'TRANSPORTE_PROPIO') 
-                    ? `<span style="background: #dcfce7; color: #166534; font-size: 11px; padding: 4px 8px; border-radius: 12px; font-weight:bold;">✓ Transporte OK</span>`
-                    : `<span style="background: #fef3c7; color: #92400e; font-size: 11px; padding: 4px 8px; border-radius: 12px; font-weight:bold;">⚠️ Falta Transporte</span>`;
-
-                cont.innerHTML += `
-                    <article class="plan-card">
-                        <div class="plan-header">
-                            <div>
-                                <h3 class="plan-title">${plan.nombre_plan}</h3>
-                                <div style="font-size: 13px; color: var(--gray-600); margin: 6px 0;">🗓️ Del ${plan.fecha_inicio} al ${plan.fecha_fin} &nbsp;&nbsp; ${badgeT}</div>
-                                <div>
-                                    <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="editarPlan(${plan.id_plan_viaje}, '${plan.nombre_plan}')">✏️ Editar Nombre</button>
-                                    <button class="btn btn-danger" style="padding: 4px 8px; font-size: 11px; margin-left: 6px;" onclick="eliminarPlan(${plan.id_plan_viaje})">🗑️ Eliminar Plan</button>
-                                </div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 12px; color: var(--gray-600); font-weight:bold;">Presupuesto</div>
-                                <div class="plan-price">$${totalPlan.toLocaleString()} COP</div>
-                            </div>
-                        </div>
-
-                        <div style="padding: 16px; border-bottom: 1px solid var(--gray-200); margin-bottom: 16px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <h4 style="font-size: 13px; font-weight: 700;">🗺️ Mapa del Trayecto:</h4>
-                                <span id="ruta-info-${plan.id_plan_viaje}" style="font-size: 12px; font-weight: 600; color: var(--primary);">⏳ Calculando...</span>
-                            </div>
-                            <div id="map-plan-${plan.id_plan_viaje}" style="height: 220px; width: 100%; border-radius: 10px; border: 1px solid var(--gray-200);"></div>
-                        </div>
-
-                        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">📌 Itinerario y Servicios:</h4>
-                        ${itemsHTML}
-
-                        <div class="plan-footer-actions">
-                            <button class="btn btn-outline" onclick="window.print()">🖨️ Imprimir Itinerario</button>
-                            <button class="btn btn-primary" onclick="window.location.href='crear_plan.html?planId=${plan.id_plan_viaje}'">+ Agregar más servicios</button>
-                        </div>
-                    </article>`;
-            });
-
-            document.getElementById("granTotal").textContent = `$${sumaTotal.toLocaleString()} COP`;
-            setTimeout(() => { inicializarMapasDePlanes(planes); }, 200);
-        }
-
-        // =====================================
-        // FUNCIONES DE EDICIÓN Y ELIMINACIÓN
-        // =====================================
-        async function eliminarPlan(idPlan) {
-            if(!confirm("¿Estás seguro de eliminar todo el plan de viaje?")) return;
-            try {
-                const res = await fetch(`${API_URL}/planes-viaje/${idPlan}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` }});
-                if(res.ok) cargarMisPlanes(); else alert("Error al eliminar.");
-            } catch(e) { console.error(e); }
-        }
-
-        async function editarPlan(idPlan, nombreActual) {
-            const nuevoNombre = prompt("Ingresa el nuevo nombre para tu viaje:", nombreActual);
-            if(!nuevoNombre || nuevoNombre === nombreActual) return;
-            try {
-                const res = await fetch(`${API_URL}/planes-viaje/${idPlan}`, { 
-                    method: "PUT", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                    body: JSON.stringify({ nombre_plan: nuevoNombre })
-                });
-                if(res.ok) cargarMisPlanes(); else alert("Error al actualizar.");
-            } catch(e) { console.error(e); }
-        }
-
-        async function eliminarItem(idDetPlan) {
-            if(!confirm("¿Deseas quitar este servicio del itinerario?")) return;
-            try {
-                const res = await fetch(`${API_URL}/planes-viaje/items/${idDetPlan}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` }});
-                if(res.ok) cargarMisPlanes(); else alert("Error al eliminar ítem.");
-            } catch(e) { console.error(e); }
-        }
-
-        async function editarItem(idDetPlan, cantActual) {
-            const cantStr = prompt("Ingresa la nueva cantidad (personas, platos, noches):", cantActual);
-            if(!cantStr) return;
-            const cant = parseInt(cantStr);
-            if(isNaN(cant) || cant < 1) { alert("Cantidad inválida"); return; }
-            try {
-                const res = await fetch(`${API_URL}/planes-viaje/items/${idDetPlan}`, { 
-                    method: "PUT", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                    body: JSON.stringify({ cantidad: cant })
-                });
-                if(res.ok) cargarMisPlanes(); else alert("Error al actualizar cantidad.");
-            } catch(e) { console.error(e); }
-        }
-
-        // =====================================
-        // MAPAS Y DIBUJO DE RUTAS
-        // =====================================
-        function inicializarMapasDePlanes(planes) {
-            const coords = { bogota: [4.6534, -74.1162], medellin: [6.2084, -75.5678], cartagena: [10.4222, -75.5392], santa_marta: [11.2408, -74.1990] };
-
-            planes.forEach(plan => {
-                const mapEl = document.getElementById(`map-plan-${plan.id_plan_viaje}`);
-                if (!mapEl) return;
-                const map = L.map(`map-plan-${plan.id_plan_viaje}`, { scrollWheelZoom: false }).setView(coords.bogota, 6);
-                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-                let oriC = coords.bogota; let desC = coords.cartagena; let desNom = "Destino";
-                const nom = (plan.nombre_plan || "").toLowerCase();
-                if (nom.includes("medellin")) { desC = coords.medellin; desNom = "Medellín"; }
-                else if (nom.includes("marta") || nom.includes("tayrona")) { desC = coords.santa_marta; desNom = "Santa Marta"; }
-                else if (nom.includes("cartagena")) { desNom = "Cartagena"; }
-
-                let esVuelo = false; let tieneTrans = false;
-                (plan.items_agregados || []).forEach(it => {
-                    if(it.tipo_item === 'TRANSPORTE_PROPIO') tieneTrans = true;
-                    if(it.tipo_item === 'TRANSPORTE') { tieneTrans = true; if(/avi[oó]n|vuelo|airbus/i.test(it.observaciones)) esVuelo = true; }
-                });
-
-                const infoSpan = document.getElementById(`ruta-info-${plan.id_plan_viaje}`);
-
-                if (esVuelo) {
-                    L.polyline([oriC, desC], { color: "#0ea5e9", weight: 4, dashArray: "10, 10" }).addTo(map);
-                    L.marker(oriC).addTo(map).bindPopup("Bogotá"); L.marker(desC).addTo(map).bindPopup(desNom);
-                    map.fitBounds(L.latLngBounds([oriC, desC]), { padding: [30, 30] });
-
-                    const dKm = Math.round(6371 * 2 * Math.asin(Math.sqrt(Math.sin((desC[0]-oriC[0])*Math.PI/360)**2 + Math.cos(oriC[0]*Math.PI/180)*Math.cos(desC[0]*Math.PI/180)*Math.sin((desC[1]-oriC[1])*Math.PI/360)**2)));
-                    const tM = Math.round((dKm/800)*60);
-                    if(infoSpan) infoSpan.innerHTML = `✈️ Vuelo Directo: <b>${dKm} km</b> | ⏱️ <b>${Math.floor(tM/60)}h ${tM%60}min</b>`;
-                } else if (tieneTrans) {
-                    if(L.Routing) {
-                        L.Routing.control({
-                            waypoints: [ L.latLng(oriC[0], oriC[1]), L.latLng(desC[0], desC[1]) ],
-                            routeWhileDragging: false, addWaypoints: false, show: false,
-                            createMarker: function(i, wp) { return L.marker(wp.latLng).bindPopup(i===0 ? `Origen` : `Destino`); },
-                            lineOptions: { styles: [{ color: '#2563eb', opacity: 0.9, weight: 5 }] }
-                        }).on('routesfound', function(e) {
-                            const dKm = Math.round(e.routes[0].summary.totalDistance / 1000); 
-                            const tM = Math.round(e.routes[0].summary.totalTime / 60); 
-                            if(infoSpan) infoSpan.innerHTML = `🚗 Vía Terrestre: <b>${dKm} km</b> | ⏱️ <b>${Math.floor(tM/60)}h ${tM%60}min</b>`;
-                        }).addTo(map);
-                    }
-                } else {
-                    L.marker(oriC).addTo(map); L.marker(desC).addTo(map);
-                    if(infoSpan) infoSpan.innerHTML = `<span style="color:#ef4444;">⚠️ Agrega transporte</span>`;
-                }
-            });
-        }
-
-        function obtenerIcono(tipo, obs) {
-            const m = { "HOSPEDAJE": "🏨", "GASTRONOMIA": "🍽️", "RECREACION": "🏖️", "DESTINO_TURISTICO": "🏖️", "GUIA": "🗺️", "TRANSPORTE_PROPIO": "🚗" };
-            if (tipo === "TRANSPORTE") { return /avi[oó]n|vuelo|airbus/i.test(obs) ? "✈️" : "🚌"; }
-            return m[tipo] || "📌";
-        }
-    </script>
+    <script src="../js/ver_planes.js"></script>
 </body>
 </html>
