@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Recuperar Contraseña - PAT</title>
+
+    <link
+        rel="stylesheet"
+        href="css/styles_login.css"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="./img/Designer_icon.png"
+    >
+
+</head>
+
+
+<body>
+
+<div class="form-container">
+
+    <h2>Recuperar Contraseña</h2>
+
+    <p
+        style="
+            color: #ccc;
+            font-size: 14px;
+            margin-bottom: 20px;
+        "
+    >
+        Ingresa tu correo registrado y te
+        generaremos las instrucciones de recuperación.
+    </p>
+
+
+    <form id="forgotForm">
+
+        <div class="input-box">
+
+            <input
+                type="email"
+                id="email"
+                placeholder=" "
+                required
+            >
+
+            <span>Email</span>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="submit-btn"
+        >
+            Enviar
+        </button>
+
+    </form>
+
+
+    <div class="login-link">
+
+        <p
+            style="
+                color:#fff;
+                margin-top:15px;
+            "
+        >
+
+            <a href="login.html">
+                Volver al Login
+            </a>
+
+        </p>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const API_URL = "http://127.0.0.1:8000";
+
+
+document
+    .getElementById("forgotForm")
+    .addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+
+        const email = document
+            .getElementById("email")
+            .value
+            .trim();
+
+
+        if (!email) {
+
+            alert(
+                "Por favor ingresa tu correo."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            const response = await fetch(
+                `${API_URL}/auth/forgot-password`,
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        email: email
+                    })
+                }
+            );
+
+
+            const data = await response.json();
+
+
+            if (response.ok) {
+
+
+                // ==========================================
+                // TOKEN DE DESARROLLO
+                // ==========================================
+
+                if (data.token_desarrollo) {
+
+                    alert(
+                        "¡Token generado con éxito! " +
+                        "En un entorno real se enviaría por correo."
+                    );
+
+
+                    window.location.href =
+                        `restablecer_contrasena.html?token=${encodeURIComponent(
+                            data.token_desarrollo
+                        )}`;
+
+
+                } else {
+
+                    alert(
+                        data.mensaje ||
+                        "Solicitud procesada correctamente."
+                    );
+                }
+
+
+            } else {
+
+                alert(
+                    data.detail ||
+                    "Error al procesar la solicitud."
+                );
+            }
+
+
+        } catch (error) {
+
+            console.error(
+                "Error:",
+                error
+            );
+
+            alert(
+                "No se pudo conectar con el servidor."
+            );
+        }
+
+    });
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Proveedor - PAT Colombia</title>
+    
+<link rel="stylesheet" href="css/gestionar_servicios.css">
+
+    <header class="navbar">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="brand">✈ PAT Proveedores</div>
+            <span class="user-tag" id="tagProveedor">Proveedor Verificado</span>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <span id="proveedorNombre" style="font-size: 14px; font-weight: 600;">Cargando...</span>
+            <button class="btn-exit" onclick="cerrarSesion()">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="card-panel">
+            <h1>Publicar Nuevo Servicio Turístico</h1>
+            <p class="subtitle">Registra tu establecimiento o actividad para que miles de turistas lo incluyan en sus planes de viaje.</p>
+
+            <form id="formCrearServicio">
+                
+                <!-- CATEGORÍA DEL SERVICIO -->
+                <div class="form-grid">
+                    <div class="full-width">
+                        <label for="id_tp_serv">¿Qué tipo de servicio vas a ofrecer? *</label>
+                        <select id="id_tp_serv" required onchange="adaptarFormularioSegunTipo()">
+                            <option value="">-- Selecciona una categoría --</option>
+                            <option value="1">🏨 Hospedaje (Hoteles, Hostales, Cabañas)</option>
+                            <option value="2">🍽️ Gastronomía (Restaurantes, Cafés, Bares)</option>
+                            <option value="3">🏖️ Recreación (Parques, Museos, Eventos)</option>
+                            <option value="4">🚌 Transporte (Vuelos, Buses, Rutas VIP)</option>
+                            <option value="5">🗺️ Guía Turístico (Tours guiados, Senderismo)</option>
+                        </select>
+                    </div>
+
+                    <!-- INFORMACIÓN GENERAL BASE -->
+                    <div class="full-width">
+                        <label for="nombre">Nombre comercial del servicio / establecimiento: *</label>
+                        <input type="text" id="nombre" placeholder="Ej: Hotel Campestre El Paraíso" required>
+                    </div>
+
+                    <div class="full-width">
+                        <label for="descripcion">Descripción detallada: *</label>
+                        <textarea id="descripcion" rows="3" placeholder="Describe los atractivos, comodidades y facilidades..." required></textarea>
+                    </div>
+
+                    <div>
+                        <label for="id_tp_turi">Tipo de Turismo: *</label>
+                        <select id="id_tp_turi" required>
+                            <option value="">Cargando...</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="id_gama">Gama / Nivel de Confort: *</label>
+                        <select id="id_gama" required>
+                            <option value="">Cargando...</option>
+                        </select>
+                    </div>
+
+                    <div class="full-width">
+                        <label for="id_ubi">Ubicación / Dirección: *</label>
+                        <select id="id_ubi" required>
+                            <option value="">Cargando ubicaciones...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- CAMPOS DINÁMICOS POR TIPO -->
+                <div id="contenedorDinamico" class="dynamic-box" style="display: none;">
+                    <div class="dynamic-title" id="tituloDinamico">Detalles de la Oferta</div>
+                    <div class="form-grid" id="camposDinamicos"></div>
+                </div>
+
+                <!-- FOTOGRAFÍA -->
+                <div class="form-grid" style="margin-bottom: 24px;">
+                    <div class="full-width">
+                        <label for="fotoServicio">Fotografía principal del servicio (Opcional):</label>
+                        <input type="file" id="fotoServicio" accept="image/png, image/jpeg, image/webp">
+                        <small style="color: var(--gray-600); font-size: 12px;">Formatos soportados: JPG, PNG o WebP.</small>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="btnGuardar">Publicar Servicio en PAT →</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Script de lógica -->
+  <script src="js/menu_proveedor/gestionar_servicios.js"></script>
+</body>
+</html>

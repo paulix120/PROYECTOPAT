@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlmodel
+pymysql
+pydantic-settings
+python-jose[cryptography]
+bcrypt
+python-multipart
+email-validator
+geopy
