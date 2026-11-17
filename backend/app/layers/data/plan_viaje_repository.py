@@ -3,8 +3,13 @@ from app.layers.models.plan_viaje import PlanViaje, DetPlanViaje
 
 class PlanViajeRepository:
     @staticmethod
-    def crear_plan(db: Session, plan: PlanViaje) -> PlanViaje:
-        db.add(plan); db.commit(); db.refresh(plan)
+    def crear_plan(db: Session, plan: PlanViaje, commit: bool = True) -> PlanViaje:
+        db.add(plan)
+        if commit:
+            db.commit()
+            db.refresh(plan)
+        else:
+            db.flush()
         return plan
 
     @staticmethod
@@ -16,27 +21,47 @@ class PlanViajeRepository:
         return db.exec(select(PlanViaje).where(PlanViaje.id_usu == id_usu)).all()
 
     @staticmethod
-    def agregar_detalle(db: Session, detalle: DetPlanViaje) -> DetPlanViaje:
-        db.add(detalle); db.commit(); db.refresh(detalle)
+    def agregar_detalle(db: Session, detalle: DetPlanViaje, commit: bool = True) -> DetPlanViaje:
+        db.add(detalle)
+        if commit:
+            db.commit()
+            db.refresh(detalle)
+        else:
+            db.flush()
         return detalle
 
     @staticmethod
-    def actualizar_detalle(db: Session, detalle: DetPlanViaje) -> DetPlanViaje:
-        db.add(detalle); db.commit(); db.refresh(detalle)
+    def actualizar_detalle(db: Session, detalle: DetPlanViaje, commit: bool = True) -> DetPlanViaje:
+        db.add(detalle)
+        if commit:
+            db.commit()
+            db.refresh(detalle)
+        else:
+            db.flush()
         return detalle
 
     @staticmethod
-    def eliminar_detalle(db: Session, detalle: DetPlanViaje):
-        db.delete(detalle); db.commit()
+    def eliminar_detalle(db: Session, detalle: DetPlanViaje, commit: bool = True):
+        db.delete(detalle)
+        if commit:
+            db.commit()
+        else:
+            db.flush()
 
     @staticmethod
-    def actualizar_plan(db: Session, plan: PlanViaje):
-        db.add(plan); db.commit(); db.refresh(plan)
+    def actualizar_plan(db: Session, plan: PlanViaje, commit: bool = True):
+        db.add(plan)
+        if commit:
+            db.commit()
+            db.refresh(plan)
+        else:
+            db.flush()
         return plan
 
     @staticmethod
     def eliminar_plan(db: Session, plan: PlanViaje):
-        db.delete(plan); db.commit()
+        db.delete(plan)
+        db.commit()
 
     @staticmethod
     def obtener_detalles(db: Session, id_plan: int):

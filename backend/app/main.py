@@ -1,8 +1,10 @@
+import os
+os.environ.setdefault("DISABLE_SQLALCHEMY_CEXT", "1")
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel
 from fastapi.staticfiles import StaticFiles
-import os 
 
 from app.db.session import engine
 from app.layers.routers import (

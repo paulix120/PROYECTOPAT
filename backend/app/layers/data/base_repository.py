@@ -3,29 +3,40 @@ from sqlmodel import Session
 
 class BaseRepository:
     """
-    Repositorio base con operaciones comunes reutilizables.
+    Repositorio base seguro con soporte para transacciones atómicas.
+    - commit=True: Para operaciones de un solo paso (guarda de inmediato).
+    - commit=False: Para operaciones de múltiples pasos (se confirma al final en el servicio).
     """
 
     @staticmethod
-    def guardar(db: Session, objeto):
+    def guardar(db: Session, objeto, commit: bool = True):
         db.add(objeto)
-        db.commit()
-        db.refresh(objeto)
+        if commit:
+            db.commit()
+            db.refresh(objeto)
+        else:
+            db.flush()  # Valida y asigna el ID primario sin cerrar la transacción
         return objeto
 
     @staticmethod
-    def actualizar(db: Session, objeto):
+    def actualizar(db: Session, objeto, commit: bool = True):
         db.add(objeto)
-        db.commit()
-        db.refresh(objeto)
+        if commit:
+            db.commit()
+            db.refresh(objeto)
+        else:
+            db.flush()
         return objeto
 
     @staticmethod
-    def eliminar_logico(db: Session, objeto):
+    def eliminar_logico(db: Session, objeto, commit: bool = True):
         objeto.activo = False
         db.add(objeto)
-        db.commit()
-        db.refresh(objeto)
+        if commit:
+            db.commit()
+            db.refresh(objeto)
+        else:
+            db.flush()
         return objeto
 
     @staticmethod
